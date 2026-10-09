@@ -6,17 +6,17 @@
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans leading-relaxed">
-    <div class="max-w-4xl mx-auto p-6 my-10 bg-white rounded-2xl shadow-xl border border-slate-100">
+    <div class="max-w-5xl mx-auto p-6 my-10 bg-white rounded-2xl shadow-xl border border-slate-100">
         <header class="border-b pb-6 mb-8 text-center">
             <h1 class="text-3xl font-bold text-slate-900">Simulador de Decisiones Pedagógicas</h1>
             <p class="text-slate-600 mt-2">Trayecto Formativo: Enseñar y Evaluar en Tiempos de IA Generativa</p>
         </header>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
             {% for id, caso in casos.items() %}
-            <button onclick="seleccionarCaso({{ id }})" id="btn-caso-{{ id }}" class="p-4 text-sm font-medium rounded-xl border transition-all text-left bg-white hover:bg-slate-100 border-slate-200">
+            <button onclick="seleccionarCaso({{ id }})" id="btn-caso-{{ id }}" class="p-4 text-sm font-medium rounded-xl border transition-all text-left bg-white hover:bg-slate-100 border-slate-200 shadow-sm">
                 <span class="block text-xs text-indigo-600 font-bold mb-1">EJE 0{{ id }}</span>
-                <span class="font-semibold text-slate-900">{{ caso.titulo.split(':')[0] }}</span>
+                <span class="font-semibold text-slate-900 block truncate">{{ caso.titulo.split(':')[0] }}</span>
             </button>
             {% endfor %}
         </div>
@@ -29,7 +29,7 @@
 
         <div id="seccion-respuesta" class="hidden">
             <label class="block font-semibold text-slate-700 mb-2">Tu análisis o propuesta de intervención:</label>
-            <textarea id="respuesta-usuario" rows="6" class="w-full p-4 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none mb-4" placeholder="Escribí aquí tu fundamentación pedagógica y conceptual..."></textarea>
+            <textarea id="respuesta-usuario" rows="6" class="w-full p-4 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none mb-4" placeholder="Escribí aquí tu fundamentación integrando dimensiones pedagógicas y técnicas..."></textarea>
             <button onclick="enviarRespuesta()" id="btn-enviar" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl transition-all shadow-md">
                 Enviar respuesta para retroalimentación pedagógica
             </button>
