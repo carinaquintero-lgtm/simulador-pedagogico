@@ -2,63 +2,400 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Simulador: Enseñar y Evaluar con IA</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Simulador de decisiones docentes · Enseñar y evaluar con IA</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600;0,9..144,700;1,9..144,600&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --tinta: #33484A;
+            --tinta-deep: #1F3032;
+            --terracota: #7CC2B9;
+            --terracota-deep: #4C948B;
+            --terracota-soft: #E7F6F3;
+            --salvia: #93C9B5;
+            --salvia-deep: #5FA089;
+            --salvia-soft: #EAF6F0;
+            --ocre: #E6A0AC;
+            --ocre-deep: #C97686;
+            --ocre-soft: #FBEBEE;
+            --coral: #EFA98D;
+            --coral-deep: #D3805F;
+            --coral-soft: #FCEFE9;
+            --arena: #F5FBFA;
+            --arena-deep: #E7F2F1;
+            --blanco: #FFFFFF;
+            --gris-suave: #5C7472;
+            --radius: 18px;
+            --font-display: "Fraunces", Georgia, serif;
+            --font-body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+            --font-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+            --ac: var(--terracota);
+            --ac-deep: var(--terracota-deep);
+            --ac-soft: var(--terracota-soft);
+        }
+        .eje-1 { --ac: var(--terracota); --ac-deep: var(--terracota-deep); --ac-soft: var(--terracota-soft); }
+        .eje-2 { --ac: var(--salvia);    --ac-deep: var(--salvia-deep);    --ac-soft: var(--salvia-soft); }
+        .eje-3 { --ac: var(--ocre);      --ac-deep: var(--ocre-deep);      --ac-soft: var(--ocre-soft); }
+        .eje-4 { --ac: var(--coral);     --ac-deep: var(--coral-deep);     --ac-soft: var(--coral-soft); }
+
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            background: var(--arena);
+            color: var(--tinta);
+            font-family: var(--font-body);
+            line-height: 1.6;
+        }
+        .wrap { max-width: 980px; margin: 0 auto; padding: 32px 20px 56px; }
+
+        .eyebrow {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+            color: var(--gris-suave);
+            margin: 0 0 8px;
+        }
+        header { margin-bottom: 28px; }
+        h1 {
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: clamp(28px, 5vw, 42px);
+            line-height: 1.15;
+            margin: 0 0 10px;
+            color: var(--tinta-deep);
+        }
+        .lead { margin: 0; max-width: 62ch; color: var(--gris-suave); }
+
+        .ejes {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 14px;
+            margin-bottom: 24px;
+        }
+        .eje-card {
+            font: inherit;
+            text-align: left;
+            cursor: pointer;
+            background: var(--blanco);
+            color: var(--tinta);
+            border: 2px solid var(--arena-deep);
+            border-top: 6px solid var(--ac);
+            border-radius: var(--radius);
+            padding: 14px 16px 16px;
+            transition: background-color .15s ease, border-color .15s ease;
+        }
+        .eje-card:hover { background: var(--ac-soft); }
+        .eje-card[aria-pressed="true"] { background: var(--ac-soft); border-color: var(--ac-deep); border-top-color: var(--ac-deep); }
+        .eje-card .num {
+            display: block;
+            font-family: var(--font-mono);
+            font-size: 12px;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+            color: var(--gris-suave);
+        }
+        .eje-card .nombre {
+            display: block;
+            margin-top: 4px;
+            font-family: var(--font-display);
+            font-weight: 600;
+            font-size: 18px;
+            line-height: 1.25;
+            color: var(--tinta-deep);
+        }
+        button:focus-visible, textarea:focus-visible, summary:focus-visible {
+            outline: 3px solid var(--tinta);
+            outline-offset: 2px;
+        }
+
+        .panel {
+            background: var(--blanco);
+            border: 2px solid var(--arena-deep);
+            border-radius: var(--radius);
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+        .caso { border-left: 8px solid var(--ac); background: var(--blanco); }
+        .caso h2 {
+            font-family: var(--font-display);
+            font-weight: 600;
+            font-size: clamp(20px, 3.4vw, 26px);
+            line-height: 1.25;
+            margin: 0 0 12px;
+            color: var(--tinta-deep);
+        }
+        .situacion { margin: 0 0 18px; }
+        .consigna {
+            background: var(--ac-soft);
+            border-radius: 12px;
+            padding: 14px 16px;
+        }
+        .consigna .eyebrow { color: var(--tinta); margin-bottom: 4px; }
+        .consigna p { margin: 0; font-weight: 500; }
+        .vacio { color: var(--gris-suave); margin: 0; }
+
+        label.campo { display: block; font-weight: 600; margin-bottom: 8px; color: var(--tinta-deep); }
+        textarea {
+            width: 100%;
+            font: inherit;
+            color: var(--tinta);
+            background: var(--blanco);
+            border: 2px solid var(--arena-deep);
+            border-radius: 12px;
+            padding: 14px 16px;
+            resize: vertical;
+            min-height: 180px;
+        }
+        textarea:focus { border-color: var(--ac-deep); }
+        .meta {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+            font-family: var(--font-mono);
+            font-size: 12px;
+            color: var(--gris-suave);
+            margin: 8px 0 16px;
+        }
+        .btn {
+            font: inherit;
+            font-weight: 600;
+            width: 100%;
+            padding: 14px 20px;
+            color: var(--blanco);
+            background: var(--tinta);
+            border: 0;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background-color .15s ease;
+        }
+        .btn:hover { background: var(--tinta-deep); }
+        .btn:disabled { opacity: .6; cursor: progress; }
+
+        .feedback { border-top: 8px solid var(--ac); }
+        .feedback h3 {
+            font-family: var(--font-display);
+            font-weight: 600;
+            font-size: 22px;
+            margin: 0 0 8px;
+            color: var(--tinta-deep);
+        }
+        .resumen { font-weight: 500; margin: 0 0 18px; }
+        .dos-col {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 14px;
+            margin-bottom: 18px;
+        }
+        .col { border-radius: 14px; padding: 16px 18px; }
+        .col.ok { background: var(--salvia-soft); border: 2px solid var(--salvia); }
+        .col.pend { background: var(--coral-soft); border: 2px solid var(--coral); }
+        .col h4 {
+            margin: 0 0 8px;
+            font-family: var(--font-mono);
+            font-size: 12px;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+            color: var(--tinta-deep);
+        }
+        .col ul { margin: 0; padding-left: 20px; }
+        .col li { margin-bottom: 6px; }
+        details {
+            border: 2px solid var(--arena-deep);
+            border-radius: 14px;
+            padding: 12px 16px;
+            margin-bottom: 14px;
+            background: var(--arena);
+        }
+        summary { cursor: pointer; font-weight: 600; color: var(--tinta-deep); }
+        details > div { margin-top: 10px; }
+        details p { margin: 0 0 10px; white-space: pre-line; }
+        .bloque { margin-bottom: 14px; }
+        .bloque h4 { margin: 0 0 6px; font-weight: 600; color: var(--tinta-deep); }
+        .bloque ul { margin: 0; padding-left: 20px; }
+        .aviso { font-size: 14px; color: var(--gris-suave); margin: 18px 0 0; }
+
+        .hidden { display: none; }
+        @media (prefers-reduced-motion: reduce) {
+            * { transition: none !important; scroll-behavior: auto !important; }
+        }
+    </style>
 </head>
-<body class="bg-slate-50 text-slate-800 font-sans leading-relaxed">
-    <div class="max-w-5xl mx-auto p-6 my-10 bg-white rounded-2xl shadow-xl border border-slate-100">
-        <header class="border-b pb-6 mb-8 text-center">
-            <h1 class="text-3xl font-bold text-slate-900">Simulador de Decisiones Pedagógicas</h1>
-            <p class="text-slate-600 mt-2">Trayecto Formativo: Enseñar y Evaluar en Tiempos de IA Generativa</p>
+<body>
+    <main class="wrap">
+        <header>
+            <p class="eyebrow">Taller · Enseñar y evaluar en tiempos de IA generativa</p>
+            <h1>Simulador de decisiones docentes</h1>
+            <p class="lead">Elegí un eje, leé la situación y escribí tu análisis. Al enviarlo recibís una devolución automática y una lectura de apoyo del eje.</p>
         </header>
 
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+        <div class="ejes" role="group" aria-label="Ejes del taller">
             {% for id, caso in casos.items() %}
-            <button onclick="seleccionarCaso({{ id }})" id="btn-caso-{{ id }}" class="p-4 text-sm font-medium rounded-xl border transition-all text-left bg-white hover:bg-slate-100 border-slate-200 shadow-sm">
-                <span class="block text-xs text-indigo-600 font-bold mb-1">EJE 0{{ id }}</span>
-                <span class="font-semibold text-slate-900 block truncate">{{ caso.titulo.split(':')[0] }}</span>
+            <button type="button" class="eje-card eje-{{ id }}" data-id="{{ id }}" aria-pressed="false">
+                <span class="num">{{ caso.eje }}</span>
+                <span class="nombre">{{ caso.nombre }}</span>
             </button>
             {% endfor %}
         </div>
 
-        <div id="contenedor-caso" class="bg-indigo-50/50 border border-indigo-100 p-6 rounded-xl mb-6">
-            <h2 id="titulo-caso" class="text-xl font-bold text-indigo-900 mb-2">Seleccioná un eje arriba para comenzar</h2>
-            <p id="desc-caso" class="text-slate-700 mb-4"></p>
-            <div id="consigna-caso" class="bg-white p-4 rounded-lg border border-indigo-100 font-medium text-slate-800"></div>
-        </div>
+        <section id="contenedor-caso" class="panel caso" aria-live="polite">
+            <p id="vacio" class="vacio">Seleccioná un eje para comenzar.</p>
+            <div id="caso-contenido" class="hidden">
+                <p class="eyebrow" id="caso-eje"></p>
+                <h2 id="titulo-caso"></h2>
+                <p id="desc-caso" class="situacion"></p>
+                <div class="consigna">
+                    <p class="eyebrow">Consigna</p>
+                    <p id="consigna-caso"></p>
+                </div>
+            </div>
+        </section>
 
-        <div id="seccion-respuesta" class="hidden">
-            <label class="block font-semibold text-slate-700 mb-2">Tu análisis o propuesta de intervención:</label>
-            <textarea id="respuesta-usuario" rows="6" class="w-full p-4 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none mb-4" placeholder="Escribí aquí tu fundamentación integrando dimensiones pedagógicas y técnicas..."></textarea>
-            <button onclick="enviarRespuesta()" id="btn-enviar" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl transition-all shadow-md">
-                Enviar respuesta para retroalimentación pedagógica
-            </button>
-        </div>
+        <section id="seccion-respuesta" class="panel hidden">
+            <label class="campo" for="respuesta-usuario">Tu análisis o propuesta de intervención</label>
+            <textarea id="respuesta-usuario" maxlength="6000" placeholder="Escribí aquí tu fundamentación, apoyándote en lo trabajado en el eje."></textarea>
+            <div class="meta">
+                <span id="contador">0 palabras</span>
+                <span>Se necesitan al menos 30 palabras para recibir devolución</span>
+            </div>
+            <button type="button" id="btn-enviar" class="btn">Enviar para recibir devolución</button>
+        </section>
 
-        <div id="seccion-feedback" class="hidden mt-8 p-6 bg-emerald-50 border border-emerald-200 rounded-xl">
-            <h3 class="text-lg font-bold text-emerald-900 mb-3">Devolución del Tutor / Simulador:</h3>
-            <div id="texto-feedback" class="text-slate-700 whitespace-pre-line space-y-2"></div>
-        </div>
-    </div>
+        <section id="seccion-feedback" class="panel feedback hidden" aria-live="polite">
+            <h3>Devolución del simulador</h3>
+            <div id="texto-feedback"></div>
+        </section>
+    </main>
 
     <script>
         const casosData = {{ casos | tojson }};
+        const MIN_PALABRAS = 30;
+        const TEXTO_BOTON = 'Enviar para recibir devolución';
+        const root = document.documentElement;
         let casoActualId = null;
+
+        function el(tag, clases, texto) {
+            const nodo = document.createElement(tag);
+            if (clases) nodo.className = clases;
+            if (texto) nodo.textContent = texto;
+            return nodo;
+        }
+
+        function contarPalabras(texto) {
+            const t = texto.trim();
+            return t ? t.split(/\s+/).length : 0;
+        }
+
+        // Convierte **negrita** en <strong> sin interpretar HTML del texto.
+        function conNegritas(contenedor, texto) {
+            texto.split('**').forEach((parte, i) => {
+                if (!parte) return;
+                contenedor.appendChild(i % 2 ? el('strong', '', parte) : document.createTextNode(parte));
+            });
+        }
+
+        function lista(titulo, items) {
+            const bloque = el('div', 'bloque');
+            bloque.appendChild(el('h4', '', titulo));
+            const ul = el('ul');
+            items.forEach(item => {
+                const li = el('li');
+                if (typeof item === 'string') {
+                    li.textContent = item;
+                } else {
+                    li.appendChild(el('strong', '', item.titulo + ': '));
+                    li.appendChild(document.createTextNode(item.pista));
+                }
+                ul.appendChild(li);
+            });
+            bloque.appendChild(ul);
+            return bloque;
+        }
+
+        function columna(clase, titulo, items) {
+            const col = el('div', 'col ' + clase);
+            col.appendChild(el('h4', '', titulo));
+            const ul = el('ul');
+            items.forEach(item => {
+                const li = el('li');
+                if (typeof item === 'string') {
+                    li.textContent = item;
+                } else {
+                    li.appendChild(el('strong', '', item.titulo));
+                    li.appendChild(el('br'));
+                    li.appendChild(document.createTextNode(item.pista));
+                }
+                ul.appendChild(li);
+            });
+            col.appendChild(ul);
+            return col;
+        }
 
         function seleccionarCaso(id) {
             casoActualId = id;
             const caso = casosData[id];
-            
-            document.getElementById('titulo-caso').innerText = caso.titulo;
-            document.getElementById('desc-caso').innerText = caso.descripcion;
-            document.getElementById('consigna-caso').innerHTML = `<strong>Consigna:</strong> ${caso.consigna}`;
-            
+
+            ['eje-1', 'eje-2', 'eje-3', 'eje-4'].forEach(c => {
+                document.getElementById('contenedor-caso').classList.remove(c);
+                document.getElementById('seccion-respuesta').classList.remove(c);
+                document.getElementById('seccion-feedback').classList.remove(c);
+            });
+            ['contenedor-caso', 'seccion-respuesta', 'seccion-feedback'].forEach(s =>
+                document.getElementById(s).classList.add('eje-' + id));
+
+            document.getElementById('vacio').classList.add('hidden');
+            document.getElementById('caso-contenido').classList.remove('hidden');
+            document.getElementById('caso-eje').textContent = caso.eje + ' · ' + caso.nombre;
+            document.getElementById('titulo-caso').textContent = caso.titulo;
+            document.getElementById('desc-caso').textContent = caso.descripcion;
+            document.getElementById('consigna-caso').textContent = caso.consigna;
+
             document.getElementById('seccion-respuesta').classList.remove('hidden');
             document.getElementById('seccion-feedback').classList.add('hidden');
-            document.getElementById('respuesta-usuario').value = '';
+            const area = document.getElementById('respuesta-usuario');
+            area.value = '';
+            document.getElementById('contador').textContent = '0 palabras';
 
-            document.querySelectorAll('[id^="btn-caso-"]').forEach(btn => btn.classList.remove('border-indigo-600', 'bg-indigo-50'));
-            document.getElementById(`btn-caso-${id}`).classList.add('border-indigo-600', 'bg-indigo-50');
+            document.querySelectorAll('.eje-card').forEach(btn =>
+                btn.setAttribute('aria-pressed', btn.dataset.id === id ? 'true' : 'false'));
+        }
+
+        function mostrarFeedback(data) {
+            const cont = document.getElementById('texto-feedback');
+            cont.replaceChildren();
+            cont.appendChild(el('p', 'resumen', data.resumen));
+
+            const hayOk = data.cubiertos && data.cubiertos.length;
+            const hayPend = data.pendientes && data.pendientes.length;
+            if (hayOk || hayPend) {
+                const dos = el('div', 'dos-col');
+                if (hayOk) dos.appendChild(columna('ok', 'Ya está presente', data.cubiertos));
+                if (hayPend) dos.appendChild(columna('pend', data.estado === 'breve' ? 'Para empezar, pensá en' : 'Podés considerar', data.pendientes));
+                cont.appendChild(dos);
+            }
+
+            if (data.lectura) {
+                const det = el('details');
+                det.appendChild(el('summary', '', 'Lectura de apoyo del eje'));
+                const cuerpo = el('div');
+                data.lectura.split('\n\n').forEach(bloque => {
+                    const p = el('p');
+                    conNegritas(p, bloque);
+                    cuerpo.appendChild(p);
+                });
+                det.appendChild(cuerpo);
+                cont.appendChild(det);
+            }
+            if (data.preguntas && data.preguntas.length) cont.appendChild(lista('Para seguir pensando', data.preguntas));
+            if (data.lecturas && data.lecturas.length) cont.appendChild(lista('Lecturas del eje', data.lecturas));
+            if (data.aviso) cont.appendChild(el('p', 'aviso', data.aviso));
+
+            const seccion = document.getElementById('seccion-feedback');
+            seccion.classList.remove('hidden');
+            seccion.scrollIntoView({ behavior: 'smooth' });
         }
 
         async function enviarRespuesta() {
@@ -70,7 +407,7 @@
 
             const btn = document.getElementById('btn-enviar');
             btn.disabled = true;
-            btn.innerText = 'Analizando tu propuesta pedagógica...';
+            btn.textContent = 'Analizando tu propuesta...';
 
             try {
                 const res = await fetch('/evaluar', {
@@ -78,18 +415,23 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ caso_id: casoActualId, respuesta: respuesta })
                 });
-                const data = await res.json();
-                
-                document.getElementById('texto-feedback').innerText = data.feedback;
-                document.getElementById('seccion-feedback').classList.remove('hidden');
-                document.getElementById('seccion-feedback').scrollIntoView({ behavior: 'smooth' });
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                mostrarFeedback(await res.json());
             } catch (err) {
-                alert('Ocurrió un error al procesar la respuesta.');
+                alert('Ocurrió un error al procesar la respuesta. Probá de nuevo en unos segundos.');
             } finally {
                 btn.disabled = false;
-                btn.innerText = 'Enviar respuesta para retroalimentación pedagógica';
+                btn.textContent = TEXTO_BOTON;
             }
         }
+
+        document.querySelectorAll('.eje-card').forEach(btn =>
+            btn.addEventListener('click', () => seleccionarCaso(btn.dataset.id)));
+        document.getElementById('btn-enviar').addEventListener('click', enviarRespuesta);
+        document.getElementById('respuesta-usuario').addEventListener('input', e => {
+            const n = contarPalabras(e.target.value);
+            document.getElementById('contador').textContent = n + (n === 1 ? ' palabra' : ' palabras');
+        });
     </script>
 </body>
 </html>
