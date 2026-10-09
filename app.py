@@ -35,7 +35,7 @@ CASOS = {
 
 @app.route('/')
 def index():
-    return render_template('index.html', casos=CASOS)
+    return render_template('simulador.html', casos=CASOS)
 
 @app.route('/evaluar', methods=['POST'])
 def evaluar():
