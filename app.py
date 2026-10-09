@@ -2,7 +2,6 @@ from flask import Flask, render_template, request, jsonify
 
 app = Flask(__name__)
 
-# Ejes pedagógicos con devoluciones enriquecidas (conceptos, autores y aspectos técnicos de IA)
 CASOS = {
     1: {
         "titulo": "Eje 01: El peligro de delegar toda la planificación en la IA sin mediación docente",
@@ -10,28 +9,28 @@ CASOS = {
         "consigna": "Analizá la situación desde los conceptos de 'enseñar es decidir' (Castañeda) y la mediación pedagógica. ¿Qué riesgos observás en delegar toda la planificación en la IA sin intervención crítica? Escribí tu análisis y propuesta de mejora.",
         "retro_base": (
             "🔍 **Análisis conceptual:** Como plantea Edith Litwin y la perspectiva de la mediación pedagógica, el docente no es un mero ejecutor sino un diseñador cultural. Enseñar implica decidir políticamente qué recortes de la realidad privilegiar ('enseñar es decidir', Castañeda).\n\n"
-            "⚙️ **Dimensión técnica de la IA:** Las LLMs (Grandes Modelos de Lenguaje) funcionan prediciendo el próximo token basándose en probabilidades estadísticas generales, sin 'comprender' el contexto socio-institucional ni las trayectorias reales de tus estudiantes. Delegar ciegamente genera respuestas genéricas y propensas a 'alucinaciones' o sesgos normalizadores.\n\n"
-            "💡 **Propuesta de mejora:** Utilizar la IA como un 'andamiaje' o co-piloto creativo para generar borradores o ideas iniciales, aplicando luego una rigurosa curaduría y transposición didáctica situada."
+            "⚙️ **Dimensión técnica de la IA:** Las LLMs funcionan prediciendo el próximo token por probabilidades estadísticas, sin comprender el contexto institucional real. Delegar ciegamente genera respuestas genéricas y propensas a alucinaciones o sesgos.\n\n"
+            "💡 **Propuesta de mejora:** Usar la IA como andamiaje inicial para borradores, aplicando luego una rigurosa curaduría y transposición didáctica situada."
         )
     },
     2: {
         "titulo": "Eje 02: Uso de IA generativa para la redacción de consignas de evaluación",
-        "descripcion": "Se diseñan consignas automáticas extremadamente complejas y abstractas mediante IA, generando barreras cognitivas no deseadas para los estudiantes de educación de jóvenes y adultos.",
+        "descripcion": "Se diseñan consignas automáticas extremadamente complejas y abstractas mediante IA, generando barreras cognitivas no deseadas para los estudiantes.",
         "consigna": "Evaluá la consigna generada bajo los principios del Diseño Universal para el Aprendizaje (DUA 3.0). ¿Cómo rediseñarías la propuesta para garantizar accesibilidad y claridad en la evaluación formativa?",
         "retro_base": (
-            "🔍 **Análisis conceptual:** Desde los principios del Diseño Universal para el Aprendizaje (DUA 3.0), una consigna opaca genera barreras de acceso que obstaculizan la metacognición y vulneran el derecho a una evaluación formativa justa.\n\n"
-            "⚙️ **Dimensión técnica de la IA:** Las inteligencias artificiales tienden a sofisticar el lenguaje y usar estructuras formales complejas si no se les asigna explícitamente un rol de 'especialista en accesibilidad' o un nivel de lectura determinado en el *prompt* (instrucción).\n\n"
-            "💡 **Propuesta de mejora:** Rediseñar la consigna pautando múltiples formas de representación y expresión, explicitando los criterios de evaluación y utilizando la IA de forma situada para adecuar la complejidad sintáctica sin perder densidad conceptual."
+            "🔍 **Análisis conceptual:** Desde el DUA 3.0, una consigna opaca genera barreras de acceso que obstaculizan la metacognición y vulneran el derecho a una evaluación formativa justa.\n\n"
+            "⚙️ **Dimensión técnica de la IA:** Las inteligencias artificiales tienden a sofisticar el lenguaje si no se les asigna explícitamente un rol de accesibilidad o nivel de lectura adecuado en el prompt.\n\n"
+            "💡 **Propuesta de mejora:** Pautar múltiples formas de representación y expresión, explicitando criterios de evaluación claros."
         )
     },
     3: {
         "titulo": "Eje 03: Criterios de evaluación y transparencia frente a producciones con IA",
-        "descripcion": "Ante la sospecha de plagio o uso automatizado de IA en los trabajos prácticos, un docente decide prohibir totalmente el uso de herramientas digitales en lugar de redefinir la tarea.",
+        "descripcion": "Ante la sospecha de uso automatizado de IA en trabajos prácticos, un docente decide prohibir totalmente el uso de herramientas digitales en lugar de redefinir la tarea.",
         "consigna": "Proponé una alternativa pedagógica basada en la coevaluación y en el registro del proceso de construcción del conocimiento, en lugar de la prohibición punitiva.",
         "retro_base": (
-            "🔍 **Análisis conceptual:** La prohibición punitiva suele ser ineficaz y contradice los enfoques socio-técnicos actuales (en sintonía con los aportes de autores que analizan la cultura digital y los procesos de apropiación tecnológica). Como sostiene la perspectiva de la evaluación formativa, el foco debe ponerse en el proceso y no sólo en el producto final.\n\n"
-            "⚙️ **Dimensión técnica de la IA:** Pretender detectar el uso de IA mediante 'detectores automáticos' es técnicamente poco fiable y genera falsos positivos frecuentes. La solución no es técnica sino pedagógica: rediseñar las tareas exigiendo metacognición, contraste de fuentes situadas y bitácoras de proceso.\n\n"
-            "💡 **Propuesta de mejora:** Establecer contratos pedagógicos claros de uso ético, incorporar instancias de coevaluación y solicitar la explicitación de cómo se interactuó con la herramienta en cada etapa de producción."
+            "🔍 **Análisis conceptual:** La prohibición punitiva suele ser ineficaz frente a los procesos de apropiación tecnológica actual. El foco de la evaluación formativa debe ponerse en el proceso y la metacognición.\n\n"
+            "⚙️ **Dimensión técnica de la IA:** Los detectores automáticos de IA son poco fiables y dan falsos positivos. La solución es pedagógica, no técnica: rediseñar tareas exigiendo bitácoras de proceso y contraste situado.\n\n"
+            "💡 **Propuesta de mejora:** Establecer contratos pedagógicos claros, incorporar coevaluación y solicitar la explicitación de la interacción con la herramienta."
         )
     }
 }
