@@ -1,1 +1,95 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Simulador: Enseñar y Evaluar con IA</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans leading-relaxed">
+    <div class="max-w-4xl mx-auto p-6 my-10 bg-white rounded-2xl shadow-xl border border-slate-100">
+        <header class="border-b pb-6 mb-8 text-center">
+            <h1 class="text-3xl font-bold text-slate-900">Simulador de Decisiones Pedagógicas</h1>
+            <p class="text-slate-600 mt-2">Trayecto Formativo: Enseñar y Evaluar en Tiempos de IA Generativa</p>
+        </header>
 
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+            {% for id, caso in casos.items() %}
+            <button onclick="seleccionarCaso({{ id }})" id="btn-caso-{{ id }}" class="p-3 text-sm font-medium rounded-xl border transition-all text-left bg-white hover:bg-slate-100 border-slate-200">
+                <span class="block text-xs text-indigo-600 font-bold">CASO 0{{ id }}</span>
+                {{ caso.titulo.split(':')[1] }}
+            </button>
+            {% endfor %}
+        </div>
+
+        <div id="contenedor-caso" class="bg-indigo-50/50 border border-indigo-100 p-6 rounded-xl mb-6">
+            <h2 id="titulo-caso" class="text-xl font-bold text-indigo-900 mb-2">Seleccioná un caso arriba para comenzar</h2>
+            <p id="desc-caso" class="text-slate-700 mb-4"></p>
+            <div id="consigna-caso" class="bg-white p-4 rounded-lg border border-indigo-100 font-medium text-slate-800"></div>
+        </div>
+
+        <div id="seccion-respuesta" class="hidden">
+            <label class="block font-semibold text-slate-700 mb-2">Tu análisis o propuesta de intervención:</label>
+            <textarea id="respuesta-usuario" rows="6" class="w-full p-4 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none mb-4" placeholder="Escribí aquí tu fundamentación pedagógica..."></textarea>
+            <button onclick="enviarRespuesta()" id="btn-enviar" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl transition-all shadow-md">
+                Enviar respuesta para retroalimentación pedagógica
+            </button>
+        </div>
+
+        <div id="seccion-feedback" class="hidden mt-8 p-6 bg-emerald-50 border border-emerald-200 rounded-xl">
+            <h3 class="text-lg font-bold text-emerald-900 mb-2">Devolución del Tutor / Simulador:</h3>
+            <div id="texto-feedback" class="text-slate-700 whitespace-pre-line"></div>
+        </div>
+    </div>
+
+    <script>
+        const casosData = {{ casos | tojson }};
+        let casoActualId = null;
+
+        function seleccionarCaso(id) {
+            casoActualId = id;
+            const caso = casosData[id];
+            
+            document.getElementById('titulo-caso').innerText = caso.titulo;
+            document.getElementById('desc-caso').innerText = caso.descripcion;
+            document.getElementById('consigna-caso').innerHTML = `<strong>Consigna:</strong> ${caso.consigna}`;
+            
+            document.getElementById('seccion-respuesta').classList.remove('hidden');
+            document.getElementById('seccion-feedback').classList.add('hidden');
+            document.getElementById('respuesta-usuario').value = '';
+
+            document.querySelectorAll('[id^="btn-caso-"]').forEach(btn => btn.classList.remove('border-indigo-600', 'bg-indigo-50'));
+            document.getElementById(`btn-caso-${id}`).classList.add('border-indigo-600', 'bg-indigo-50');
+        }
+
+        async function enviarRespuesta() {
+            const respuesta = document.getElementById('respuesta-usuario').value;
+            if (!respuesta.trim()) {
+                alert('Por favor, escribí una respuesta antes de enviar.');
+                return;
+            }
+
+            const btn = document.getElementById('btn-enviar');
+            btn.disabled = true;
+            btn.innerText = 'Analizando tu propuesta pedagógica...';
+
+            try {
+                const res = await fetch('/evaluar', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ caso_id: casoActualId, respuesta: respuesta })
+                });
+                const data = await res.json();
+                
+                document.getElementById('texto-feedback').innerText = data.feedback;
+                document.getElementById('seccion-feedback').classList.remove('hidden');
+                document.getElementById('seccion-feedback').scrollIntoView({ behavior: 'smooth' });
+            } catch (err) {
+                alert('Ocurrió un error al procesar la respuesta.');
+            } finally {
+                btn.disabled = false;
+                btn.innerText = 'Enviar respuesta para retroalimentación pedagógica';
+            }
+        }
+    </script>
+</body>
+</html>
