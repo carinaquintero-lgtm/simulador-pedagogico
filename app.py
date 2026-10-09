@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, jsonify
 
 app = Flask(__name__)
 
+# Ejes pedagógicos con devoluciones enriquecidas (conceptos, autores y aspectos técnicos de IA)
 CASOS = {
     1: {
         "titulo": "Eje 01: El peligro de delegar toda la planificación en la IA sin mediación docente",
@@ -49,11 +50,26 @@ def evaluar():
     if not caso:
         return jsonify({"feedback": "Eje no encontrado."}), 404
     
+    # Validación específica según el eje seleccionado
     if len(respuesta) < 40:
-        feedback = (
-            f"⚠️ **Intervención breve:** Tu respuesta es muy escueta para un análisis riguroso de este eje ({caso['titulo']}). "
-            f"Te sugerimos ampliar la fundamentación integrando conceptos pedagógicos y reflexionando sobre el rol de la mediación tecnológica."
-        )
+        if caso_id == 1:
+            feedback = (
+                "⚠️ **Análisis incompleto para el Eje 01:** Tu respuesta es muy breve. "
+                "Debés integrar los conceptos de **'enseñar es decidir' (Castañeda)** y **mediación pedagógica (Edith Litwin)**. "
+                "Desde lo técnico, tenés que mencionar qué ocurre con la **predicción estadística de tokens** y las **alucinaciones** de las LLMs al carecer de contexto institucional."
+            )
+        elif caso_id == 2:
+            feedback = (
+                "⚠️ **Análisis incompleto para el Eje 02:** Tu respuesta es muy breve. "
+                "Debés integrar los principios del **Diseño Universal para el Aprendizaje (DUA 3.0)** y la **evaluación formativa**. "
+                "Desde lo técnico, debés explicar cómo las IA sofistican el lenguaje por defecto y la importancia de estructurar los **prompts** para garantizar accesibilidad."
+            )
+        else:
+            feedback = (
+                "⚠️ **Análisis incompleto para el Eje 03:** Tu respuesta es muy breve. "
+                "Debés abordar los límites de la **prohibición punitiva** y los enfoques de **coevaluación y metacognición**. "
+                "Desde lo técnico, tenés que fundamentar por qué fallan los **detectores automáticos de IA** y cómo exigir **bitácoras de proceso**."
+            )
     else:
         feedback = (
             f"¡Excelente producción, Carina! Tu análisis demuestra una sólida apropiación del problema.\n\n"
