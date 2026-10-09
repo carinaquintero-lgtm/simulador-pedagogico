@@ -1,58 +1,95 @@
-from flask import Flask, render_template, request, jsonify
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Simulador: Enseñar y Evaluar con IA</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans leading-relaxed">
+    <div class="max-w-4xl mx-auto p-6 my-10 bg-white rounded-2xl shadow-xl border border-slate-100">
+        <header class="border-b pb-6 mb-8 text-center">
+            <h1 class="text-3xl font-bold text-slate-900">Simulador de Decisiones Pedagógicas</h1>
+            <p class="text-slate-600 mt-2">Trayecto Formativo: Enseñar y Evaluar en Tiempos de IA Generativa</p>
+        </header>
 
-app = Flask(__name__)
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            {% for id, caso in casos.items() %}
+            <button onclick="seleccionarCaso({{ id }})" id="btn-caso-{{ id }}" class="p-4 text-sm font-medium rounded-xl border transition-all text-left bg-white hover:bg-slate-100 border-slate-200">
+                <span class="block text-xs text-indigo-600 font-bold mb-1">EJE 0{{ id }}</span>
+                <span class="font-semibold text-slate-900">{{ caso.titulo.split(':')[0] }}</span>
+            </button>
+            {% endfor %}
+        </div>
 
-# Casos pedagógicos y devoluciones precalculadas basadas en criterios de retroalimentación formativa
-CASOS = {
-    1: {
-        "titulo": "Caso 01: El peligro de delegar toda la planificación en la IA sin mediación docente",
-        "descripcion": "Un docente utiliza ChatGPT para que le planifique toda la secuencia didáctica de un trimestre sin revisar los contextos institucionales ni los saberes previos del grupo.",
-        "consigna": "Analizá la situación desde los conceptos de 'enseñar es decidir' (Castañeda) y la mediación pedagógica. ¿Qué riesgos observás en delegar toda la planificación en la IA sin intervención crítica? Escribí tu análisis y propuesta de mejora.",
-        "retro_base": "Excelente análisis sobre la mediación pedagógica. Al delegar sin revisión, se pierde la autoría docente y el anclaje institucional. La intervención crítica es fundamental para adecuar la propuesta al grupo real de estudiantes."
-    },
-    2: {
-        "titulo": "Caso 02: Uso de IA generativa para la redacción de consignas de evaluación",
-        "descripcion": "Se diseñan consignas automáticas extremadamente complejas y abstractas mediante IA, generando barreras cognitivas no deseadas para los estudiantes de educación de jóvenes y adultos.",
-        "consigna": "Evaluá la consigna generada bajo los principios del Diseño Universal para el Aprendizaje (DUA 3.0). ¿Cómo rediseñarías la propuesta para garantizar accesibilidad y claridad en la evaluación formativa?",
-        "retro_base": "Muy buena mirada desde el DUA 3.0. Considerar las múltiples formas de representación y expresión evita que la consigna sea una barrera en lugar de un instrumento de evaluación formativa auténtica."
-    },
-    3: {
-        "titulo": "Caso 03: Criterios de evaluación y transparencia frente a producciones con IA",
-        "descripcion": "Ante la sospecha de plagio o uso automatizado de IA en los trabajos prácticos, un docente decide prohibir totalmente el uso de herramientas digitales en lugar de redefinir la tarea.",
-        "consigna": "Proponé una alternativa pedagógica basada en la coevaluación y en el registro del proceso de construcción del conocimiento, en lugar de la prohibición punitiva.",
-        "retro_base": "Enfoque muy pertinente. La prohibición suele ser ineficaz; en su lugar, explicitar los criterios de uso ético, documentar el proceso de trabajo y fomentar la metacognición transforma la IA en un recurso de aprendizaje."
-    }
-}
+        <div id="contenedor-caso" class="bg-indigo-50/50 border border-indigo-100 p-6 rounded-xl mb-6">
+            <h2 id="titulo-caso" class="text-xl font-bold text-indigo-900 mb-2">Seleccioná un eje arriba para comenzar</h2>
+            <p id="desc-caso" class="text-slate-700 mb-4"></p>
+            <div id="consigna-caso" class="bg-white p-4 rounded-lg border border-indigo-100 font-medium text-slate-800"></div>
+        </div>
 
-@app.route('/')
-def index():
-    return render_template('simulador.html', casos=CASOS)
+        <div id="seccion-respuesta" class="hidden">
+            <label class="block font-semibold text-slate-700 mb-2">Tu análisis o propuesta de intervención:</label>
+            <textarea id="respuesta-usuario" rows="6" class="w-full p-4 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none mb-4" placeholder="Escribí aquí tu fundamentación pedagógica y conceptual..."></textarea>
+            <button onclick="enviarRespuesta()" id="btn-enviar" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl transition-all shadow-md">
+                Enviar respuesta para retroalimentación pedagógica
+            </button>
+        </div>
 
-@app.route('/evaluar', methods=['POST'])
-def evaluar():
-    data = request.get_json()
-    caso_id = data.get('caso_id')
-    respuesta = data.get('respuesta', '').strip()
-    
-    caso = CASOS.get(caso_id)
-    if not caso:
-        return jsonify({"feedback": "Caso no encontrado."}), 404
-    
-    # Análisis inteligente simulado según la longitud y pertinencia de la respuesta
-    if len(respuesta) < 30:
-        feedback = (
-            f"Tu respuesta es muy breve. Para enriquecer la intervención en este caso "
-            f"sobre '{caso['titulo']}', te sugerimos profundizar en la fundamentación teórica "
-            f"y vincularla de manera más directa con los conceptos trabajados en el trayecto."
-        )
-    else:
-        feedback = (
-            f"¡Muy buen aporte, Carina! Tu intervención aborda con solidez el núcleo problemático.\n\n"
-            f"🔍 **Retroalimentación pedagógica:** {caso['retro_base']}\n\n"
-            f"💡 **Sugerencia para la práctica:** Continuá promoviendo espacios de reflexión crítica donde la tecnología se subordine siempre a los propósitos político-pedagógicos de la enseñanza."
-        )
-        
-    return jsonify({"feedback": feedback})
+        <div id="seccion-feedback" class="hidden mt-8 p-6 bg-emerald-50 border border-emerald-200 rounded-xl">
+            <h3 class="text-lg font-bold text-emerald-900 mb-3">Devolución del Tutor / Simulador:</h3>
+            <div id="texto-feedback" class="text-slate-700 whitespace-pre-line space-y-2"></div>
+        </div>
+    </div>
 
-if __name__ == '__main__':
-    app.run(debug=True)
+    <script>
+        const casosData = {{ casos | tojson }};
+        let casoActualId = null;
+
+        function seleccionarCaso(id) {
+            casoActualId = id;
+            const caso = casosData[id];
+            
+            document.getElementById('titulo-caso').innerText = caso.titulo;
+            document.getElementById('desc-caso').innerText = caso.descripcion;
+            document.getElementById('consigna-caso').innerHTML = `<strong>Consigna:</strong> ${caso.consigna}`;
+            
+            document.getElementById('seccion-respuesta').classList.remove('hidden');
+            document.getElementById('seccion-feedback').classList.add('hidden');
+            document.getElementById('respuesta-usuario').value = '';
+
+            document.querySelectorAll('[id^="btn-caso-"]').forEach(btn => btn.classList.remove('border-indigo-600', 'bg-indigo-50'));
+            document.getElementById(`btn-caso-${id}`).classList.add('border-indigo-600', 'bg-indigo-50');
+        }
+
+        async function enviarRespuesta() {
+            const respuesta = document.getElementById('respuesta-usuario').value;
+            if (!respuesta.trim()) {
+                alert('Por favor, escribí una respuesta antes de enviar.');
+                return;
+            }
+
+            const btn = document.getElementById('btn-enviar');
+            btn.disabled = true;
+            btn.innerText = 'Analizando tu propuesta pedagógica...';
+
+            try {
+                const res = await fetch('/evaluar', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ caso_id: casoActualId, respuesta: respuesta })
+                });
+                const data = await res.json();
+                
+                document.getElementById('texto-feedback').innerText = data.feedback;
+                document.getElementById('seccion-feedback').classList.remove('hidden');
+                document.getElementById('seccion-feedback').scrollIntoView({ behavior: 'smooth' });
+            } catch (err) {
+                alert('Ocurrió un error al procesar la respuesta.');
+            } finally {
+                btn.disabled = false;
+                btn.innerText = 'Enviar respuesta para retroalimentación pedagógica';
+            }
+        }
+    </script>
+</body>
+</html>
