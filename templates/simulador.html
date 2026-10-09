@@ -2,10 +2,10 @@ from flask import Flask, render_template, request, jsonify
 
 app = Flask(__name__)
 
-# Casos pedagógicos con devoluciones enriquecidas (conceptos, autores y aspectos técnicos de IA)
+# Ejes pedagógicos con devoluciones enriquecidas (conceptos, autores y aspectos técnicos de IA)
 CASOS = {
     1: {
-        "titulo": "Caso 01: El peligro de delegar toda la planificación en la IA sin mediación docente",
+        "titulo": "Eje 01: El peligro de delegar toda la planificación en la IA sin mediación docente",
         "descripcion": "Un docente utiliza ChatGPT para que le planifique toda la secuencia didáctica de un trimestre sin revisar los contextos institucionales ni los saberes previos del grupo.",
         "consigna": "Analizá la situación desde los conceptos de 'enseñar es decidir' (Castañeda) y la mediación pedagógica. ¿Qué riesgos observás en delegar toda la planificación en la IA sin intervención crítica? Escribí tu análisis y propuesta de mejora.",
         "retro_base": (
@@ -15,7 +15,7 @@ CASOS = {
         )
     },
     2: {
-        "titulo": "Caso 02: Uso de IA generativa para la redacción de consignas de evaluación",
+        "titulo": "Eje 02: Uso de IA generativa para la redacción de consignas de evaluación",
         "descripcion": "Se diseñan consignas automáticas extremadamente complejas y abstractas mediante IA, generando barreras cognitivas no deseadas para los estudiantes de educación de jóvenes y adultos.",
         "consigna": "Evaluá la consigna generada bajo los principios del Diseño Universal para el Aprendizaje (DUA 3.0). ¿Cómo rediseñarías la propuesta para garantizar accesibilidad y claridad en la evaluación formativa?",
         "retro_base": (
@@ -25,7 +25,7 @@ CASOS = {
         )
     },
     3: {
-        "titulo": "Caso 03: Criterios de evaluación y transparencia frente a producciones con IA",
+        "titulo": "Eje 03: Criterios de evaluación y transparencia frente a producciones con IA",
         "descripcion": "Ante la sospecha de plagio o uso automatizado de IA en los trabajos prácticos, un docente decide prohibir totalmente el uso de herramientas digitales en lugar de redefinir la tarea.",
         "consigna": "Proponé una alternativa pedagógica basada en la coevaluación y en el registro del proceso de construcción del conocimiento, en lugar de la prohibición punitiva.",
         "retro_base": (
@@ -44,16 +44,15 @@ def index():
 def evaluar():
     data = request.get_json()
     caso_id = data.get('caso_id')
+    caso = CASOS.get(caso_id)
     respuesta = data.get('respuesta', '').strip()
     
-    caso = CASOS.get(caso_id)
     if not caso:
-        return jsonify({"feedback": "Caso no encontrado."}), 404
+        return jsonify({"feedback": "Eje no encontrado."}), 404
     
-    # Validación de extensión y entrega de retroalimentación enriquecida
     if len(respuesta) < 40:
         feedback = (
-            f"⚠️ **Intervención breve:** Tu respuesta es muy escueta para un análisis riguroso de este caso ({caso['titulo']}). "
+            f"⚠️ **Intervención breve:** Tu respuesta es muy escueta para un análisis riguroso de este eje ({caso['titulo']}). "
             f"Te sugerimos ampliar la fundamentación integrando conceptos pedagógicos y reflexionando sobre el rol de la mediación tecnológica."
         )
     else:
